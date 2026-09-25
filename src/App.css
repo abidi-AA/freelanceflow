@@ -201,6 +201,23 @@ tr:hover td { background: #f9fafb; }
 
 .loading { display: flex; align-items: center; justify-content: center; height: 100vh; font-size: 14px; color: var(--text-3); }
 
+/* AUTH */
+.auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--bg); }
+.auth-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 32px 28px; width: 100%; max-width: 380px; text-align: center; }
+.auth-icon { font-size: 40px; margin-bottom: 10px; }
+.auth-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.auth-sub { font-size: 13px; color: var(--text-2); margin-bottom: 20px; line-height: 1.6; }
+.auth-card form { text-align: left; }
+.auth-notice { background: var(--green-bg); color: var(--green); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 12px; margin-bottom: 14px; text-align: left; }
+.auth-error { background: var(--red-bg); color: var(--red); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 12px; margin-bottom: 14px; text-align: left; }
+.auth-links { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+.auth-links-sep { color: var(--text-3); font-size: 12px; }
+.link-btn { background: transparent; border: none; color: var(--text-2); font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; text-decoration: underline; padding: 0; }
+.link-btn:hover { color: var(--text); }
+
+.account-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.account-email { font-size: 12px; color: var(--text-2); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 /* MOBILE BOTTOM NAV */
 .bottom-nav { display: none; }
 

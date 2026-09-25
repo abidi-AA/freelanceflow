@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
+import Modal from "./Modal.jsx";
 import "./App.css";
 
 const DATA_KEY   = "ff_data_v3";
 const VISIT_KEY  = "ff_first_visit";
+const scopedKey  = (base, userId) => `${base}:${userId}`;
 const PAY_LINK   = "https://buy.stripe.com/REPLACE_WITH_YOUR_STRIPE_LINK";
 const PRO_DAYS   = 30;
 
@@ -19,14 +21,6 @@ const SL    = { paid: "Paid", sent: "Sent", overdue: "Overdue", draft: "Draft" }
 
 function Badge({ status }) {
   return <span className={`badge badge-${status}`}>{SL[status] || status}</span>;
-}
-
-function Modal({ onClose, children }) {
-  return (
-    <div className="overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal">{children}</div>
-    </div>
-  );
 }
 
 function UpgradeModal({ onClose }) {
@@ -55,7 +49,7 @@ function UpgradeModal({ onClose }) {
   );
 }
 
-export default function App() {
+export default function App({ user, onLogout }) {
   const [d, setD]           = useState(null);
   const [tab, setTab]       = useState("dashboard");
   const [modal, setModal]   = useState(null);
@@ -66,20 +60,21 @@ export default function App() {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(DATA_KEY);
+      const raw = localStorage.getItem(scopedKey(DATA_KEY, user.id));
       setD(raw ? JSON.parse(raw) : { ...EMPTY });
     } catch { setD({ ...EMPTY }); }
-    let fv = localStorage.getItem(VISIT_KEY);
-    if (!fv) { fv = Date.now().toString(); localStorage.setItem(VISIT_KEY, fv); }
+    const visitKey = scopedKey(VISIT_KEY, user.id);
+    let fv = localStorage.getItem(visitKey);
+    if (!fv) { fv = Date.now().toString(); localStorage.setItem(visitKey, fv); }
     setFV(fv);
-  }, []);
+  }, [user.id]);
 
   const persist = useCallback(next => {
     setD(next);
-    try { localStorage.setItem(DATA_KEY, JSON.stringify(next)); } catch {}
+    try { localStorage.setItem(scopedKey(DATA_KEY, user.id), JSON.stringify(next)); } catch {}
     setSaved(true);
     setTimeout(() => setSaved(false), 1800);
-  }, []);
+  }, [user.id]);
 
   if (!d) return <div className="loading">Loading FreelanceFlow…</div>;
 
@@ -146,9 +141,12 @@ export default function App() {
           ))}
         </nav>
         <div className="sidebar-footer">
-          {isProEligible
-            ? <button className="btn btn-purple btn-sm" style={{width:"100%"}} onClick={()=>setModal("upgrade")}>⚡ Upgrade to Pro</button>
-            : <span>Your data is saved locally</span>}
+          <div className="account-row">
+            <span className="account-email" title={user.email}>{user.name || user.email}</span>
+            <button className="link-btn" onClick={onLogout}>Log out</button>
+          </div>
+          {isProEligible &&
+            <button className="btn btn-purple btn-sm" style={{width:"100%",marginTop:"8px"}} onClick={()=>setModal("upgrade")}>⚡ Upgrade to Pro</button>}
         </div>
       </aside>
 
@@ -173,8 +171,8 @@ export default function App() {
           {isNewUser && tab==="dashboard" && (
             <div className="onboarding">
               <div className="onboarding-icon">🌊</div>
-              <h1>Welcome to FreelanceFlow</h1>
-              <p>Your personal income tracker. Set up in 2 minutes — no account needed.</p>
+              <h1>Welcome{user.name ? `, ${user.name.split(" ")[0]}` : ""} 👋</h1>
+              <p>Your personal income tracker. Set up in 2 minutes.</p>
               <div className="onboarding-steps">
                 {[["1","Add your first client","The company or person you work for"],["2","Create an invoice","Log what you delivered and the amount"],["3","Mark it paid","Watch your dashboard update in real time"]].map(([n,title,sub])=>(
                   <div key={n} className="onboarding-step">
